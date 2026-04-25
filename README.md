@@ -59,10 +59,10 @@ ENG | BASE | EGG
 3. メニュー画面でマップと手持ちを同じ行に配置する（推奨）
 - メニュー機能を選択する際、同じ行に配置すると探索が最小限で済みます。時短になります。
 
-![ステップ1](expImg/step1.png)  
-![ステップ2](expImg/step2.png)  
-![ステップ3](expImg/step3.png)  
-![ステップ4](expImg/step4.png)
+![参考画像1](./expImg/step1.png)  
+![参考画像2](./expImg/step2.png)  
+![参考画像3](./expImg/step3.png)  
+![参考画像4](./expImg/step4.png)
 
 ファイルが存在しない場合は画像は表示されません。
 
