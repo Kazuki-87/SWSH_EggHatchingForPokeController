@@ -429,6 +429,7 @@ class SWSH_Egg_1BOX(ImageProcPythonCommandTrim):
                     self.LINE_image("*** shiny ***")  # LINE通知不要なら削除
                 self.shinyCol = num 
                 self.shinyRow = i + 1
+                self.shiny_total += 1
                 print(f'色違い発見！: {self.shinyCol}列目 {self.shinyRow}段目')
                 # if self.is_sleep:
                 #     self.power_sleep()
