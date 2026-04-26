@@ -13,6 +13,11 @@
 - 色違い発見時リセット: [`SWSH_Egg_1BOX.softReboot`](SerialController/Commands/PythonCommands/SWSH_Egg_1BOX.py)  
 - 実行終了後スリープ移行: [`SWSH_Egg_1BOX.power_sleep`](SerialController/Commands/PythonCommands/SWSH_Egg_1BOX.py)
 
+## 紹介動画（1サイクル解説動画）
+1サイクル分の動作の解説をしてます。こちらのREADMEと合わせてご確認ください。
+
+[![自動孵化デモ動画](https://img.youtube.com/vi/f64I7NhG7AM/maxresdefault.jpg)](https://youtu.be/f64I7NhG7AM)
+
 ## 処理概要（簡易フロー）
 1. 実行環境確認（Poke-Controller Modified/Extension 判定）  
 2. ダイアログでパラメータを設定（色違い上限、LINE 通知、言語など）  
