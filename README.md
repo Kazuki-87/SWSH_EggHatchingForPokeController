@@ -36,7 +36,23 @@
 
 ## 使用方法（概略）
 1. Poke-Controller の UI からコマンド名「SWSH 色違い孵化 1BOX」を選択して実行（表示名はクラスの NAME 属性）。  
-2. ダイアログでパラメータを設定（色違い上限数・言語・LINE 通知など）。  
+2. ダイアログでパラメータを設定（色違い上限数・言語・LINE 通知など）。
+- ダイアログの項目にある「個体値チェックモード」では、以下のモードを選べます。
+
+モード名 | 個体値（H-A-B-C-D-S）
+---|---
+チェックなし | 個体値確認しません。
+6V | 31-31-31-31-31-31
+A0-5V | 31-0-31-31-31-31
+C0-5V | 31-31-31-0-31-31
+S0-5V | 31-31-31-31-31-0
+AS0-4V | 31-0-31-31-31-0
+CS0-4V | 31-31-31-0-31-0
+
+- 言語は現在「ENG」「JPN」のみ対応しています。
+
+![参考画像5](expImg/exp5.png)
+
 3. 実行中はカメラ映像とテンプレート認識の状態を確認し、必要に応じてテンプレートを更新。
 
 ## 開始前チェックリスト
@@ -73,8 +89,13 @@ ENG | BASE | EGG
 ## 参照ファイル
 - コマンド本体: [SerialController/Commands/PythonCommands/SWSH_Egg_1BOX.py](SerialController/Commands/PythonCommands/SWSH_Egg_1BOX.py)  
 - テンプレート: [SerialController/Commands/Template/SWSH/EGG_Util/ENG/](SerialController/Commands/Template/SWSH/EGG_Util/ENG/) / [SerialController/Commands/Template/SWSH/EGG_Util/JPN/](SerialController/Commands/Template/SWSH/EGG_Util/JPN/)  
-- 説明画像フォルダ: [expImg/](expImg/)  
+- 説明画像フォルダ: [expImg/](expImg/)
+- 参考フォルダ（ライン通知設定について）： [参考](参考/)
 - この README: [README.md](README.md)
+
+## ライン通知設定について
+本プログラムではライン通知によって色違いの報告や孵化数の定期報告をさせています。
+ライン通知のモジュールを無理やりディスコード通知版に変更するためのソースコードや解説は[参考](参考/)フォルダのファイルをご確認ください。
 
 ## 注意事項
 - 画面フォントや解像度がテンプレートと異なると認識精度が下がります。テンプレート画像は実機で再キャプチャして調整してください。  
