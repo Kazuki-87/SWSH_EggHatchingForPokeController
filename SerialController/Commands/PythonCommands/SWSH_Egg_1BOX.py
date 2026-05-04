@@ -9,6 +9,10 @@ import time, cv2, os, re, datetime, glob, json
 import datetime
 import numpy as np
 
+class EggHatchError(Exception):
+    """孵化処理用のカスタム例外"""
+    pass
+
 class SWSH_Egg_1BOX(ImageProcPythonCommandTrim):
     NAME = 'SWSH 色違い孵化 1BOX'
     TAGS = ['SWSH', 'Shiny']
@@ -18,6 +22,7 @@ class SWSH_Egg_1BOX(ImageProcPythonCommandTrim):
         self.show_value = True
         self.lang = 'ENG'
         self.dispCheckLog = True
+        self.target_status_name = '未設定'
     
     def sendCommand(self, row: str, wait: float = 0.04):
         self.keys.ser.ser.write((row + '\r\n').encode('utf-8'))
@@ -28,7 +33,7 @@ class SWSH_Egg_1BOX(ImageProcPythonCommandTrim):
         # 実行環境確認
         self.judgePokeConEdition()
         self.jprint_overwrite("---------------------------------------\n"+
-                    "自動タマゴ孵化(SWSH)_色卵v1.0\n"+
+                    "自動タマゴ孵化(SWSH)_色卵v1.1\n"+
                     "Copyright(c) 2026 【X】@cure_kazuki \n"+
                     "---------------------------------------")
 
@@ -59,6 +64,7 @@ class SWSH_Egg_1BOX(ImageProcPythonCommandTrim):
                     f"【色違い上限数】{str(max_count)}\n"+
                     f"【画像認識近似値表示】{str(self.show_value)}\n"+
                     f"【LINE通知】{str(self.use_LINEnotice)}\n"+
+                    f"【厳選個体値】{self.target_status_name}\n"+
                     "---------------------------------------")
 
         Lstick_down  = "0x0003 8 80 ff 80 80"   # LSTICK-DOWN
@@ -114,6 +120,10 @@ class SWSH_Egg_1BOX(ImageProcPythonCommandTrim):
                         self.moveShinyEggToEmpty()
                         self.hasShiny = False
                         self.report()
+                        if self.use_LINEnotice:
+                            if self.shiny_total > 0:
+                                self.LINE_text(f'{self.pkmn_name}孵化厳選\n【孵化総数】{self.shiny_total}/{self.hatched_egg_total}\n【確率】1/{self.hatched_egg_total / self.shiny_total}')
+                        self.hatched_egg_total -= 4 # 色違いを退避させるときに4匹分のタマゴも一緒に移動させているため、孵化総数から4を引く
                         continue
                     self.resetPositionEastLakeAxewell()
                     self.report()
@@ -135,21 +145,28 @@ class SWSH_Egg_1BOX(ImageProcPythonCommandTrim):
                     now_time = datetime.datetime.now().time()
                     if before_time > now_time: #0:00
                         end_time = datetime.datetime.now()
-                        self.LINE_text(f'{self.pkmn_name}孵化厳選\n【実行時間】{end_time - start_time}\n【孵化総数】{self.shiny_total}/{self.hatched_egg_total}')
+                        self.LINE_text(f'{self.pkmn_name}孵化厳選\n【実行時間】{end_time - start_time}\n【孵化総数】{self.shiny_total}/{self.hatched_egg_total}\n【退避数(色違い・理想個体)】{self.moveNum}')
                     elif (before_time < datetime.time(6, 0, 0, 0)) and (datetime.time(6, 0, 0, 0) < now_time): #6:00
                         end_time = datetime.datetime.now()
-                        self.LINE_text(f'{self.pkmn_name}孵化厳選\n【実行時間】{end_time - start_time}\n【孵化総数】{self.shiny_total}/{self.hatched_egg_total}')
+                        self.LINE_text(f'{self.pkmn_name}孵化厳選\n【実行時間】{end_time - start_time}\n【孵化総数】{self.shiny_total}/{self.hatched_egg_total}\n【退避数(色違い・理想個体)】{self.moveNum}')
                     elif (before_time < datetime.time(12, 0, 0, 0)) and (datetime.time(12, 0, 0, 0) < now_time): #12:00
                         end_time = datetime.datetime.now()
-                        self.LINE_text(f'{self.pkmn_name}孵化厳選\n【実行時間】{end_time - start_time}\n【孵化総数】{self.shiny_total}/{self.hatched_egg_total}')
+                        self.LINE_text(f'{self.pkmn_name}孵化厳選\n【実行時間】{end_time - start_time}\n【孵化総数】{self.shiny_total}/{self.hatched_egg_total}\n【退避数(色違い・理想個体)】{self.moveNum}')
                     elif (before_time < datetime.time(18, 0, 0, 0)) and (datetime.time(18, 0, 0, 0) < now_time): #18:00
                         end_time = datetime.datetime.now()
-                        self.LINE_text(f'{self.pkmn_name}孵化厳選\n【実行時間】{end_time - start_time}\n【孵化総数】{self.shiny_total}/{self.hatched_egg_total}')
-
-        except Exception as e:
-            print(f"エラーが発生しました: {e}")
+                        self.LINE_text(f'{self.pkmn_name}孵化厳選\n【実行時間】{end_time - start_time}\n【孵化総数】{self.shiny_total}/{self.hatched_egg_total}\n【退避数(色違い・理想個体)】{self.moveNum}')
+        except EggHatchError as e:
+            print(f"孵化処理中にエラーが発生しました: {e}")
             if self.use_LINEnotice:
-                self.LINE_image("*** Error ***")  # LINE通知不要なら削除
+                self.LINE_text(f"孵化処理中にエラーが発生しました: {e}")
+        except Exception as e:
+            msg = str(e)
+            print(f"エラーが発生しました: {msg}")
+            if self.use_LINEnotice and msg != "exit successfully":
+                self.LINE_image(f"エラーが発生しました: {msg}")  # LINE通知不要なら削除
+            if msg == "exit successfully":
+                print("正常に終了しました。")
+                self.finish()
 
         if self.is_sleep:
             self.power_sleep()
@@ -183,6 +200,9 @@ class SWSH_Egg_1BOX(ImageProcPythonCommandTrim):
             while not self.isContainTemplate(f'SWSH/EGG_Util/{self.lang}/turffield.png', 0.85, use_gray=False, show_value=self.show_value):
                 self.press(Button.R, 0.1, 0.5)
             self.press(Direction(Stick.LEFT,0), duration=0.1, wait=0.5)
+            if self.isContainTemplate(f'SWSH/EGG_Util/sodateya.png', 0.70, use_gray=False, show_value=self.show_value):
+                selectedSodateya = True
+                break
             self.press(Direction(Stick.LEFT,45), duration=0.01, wait=1)
             if self.isContainTemplate(f'SWSH/EGG_Util/sodateya.png', 0.70, use_gray=False, show_value=self.show_value):
                 selectedSodateya = True
@@ -522,9 +542,11 @@ class SWSH_Egg_1BOX(ImageProcPythonCommandTrim):
         return status
     
     # 理想個体比較
-    def compStatus(self,status1,status2):
-        for i in range(len(status1)):
-            if status1[i] != status2[i]:
+    def compStatus(self,target_status,comp_status):
+        for i in range(len(target_status)):
+            if target_status[i] == 99: # 個体値厳選しないステータスはスキップ
+                continue
+            if target_status[i] != comp_status[i]:
                 return False
         return True
     
@@ -579,6 +601,9 @@ class SWSH_Egg_1BOX(ImageProcPythonCommandTrim):
         row = 1
         col = 1
         while count < 31:
+            if self.isShiny():
+                self.jprint_append('色違いを確認！')
+                self.movePokemonToEmpty(row, col)
             if self.target_status is not None: # 個体値厳選している場合は理想個体か確認してから逃がす
                 if self.compStatus(self.target_status,self.judgeStatus()): # 理想個体の場合
                     self.jprint_append('理想個体を確認！')
@@ -634,9 +659,7 @@ class SWSH_Egg_1BOX(ImageProcPythonCommandTrim):
                 self.moveCellFocus(1, 1, row, col)
                 self.moveNum += 1
         else:
-            print('となりのボックスに空きがありません。')
-            self.power_sleep()
-            self.finish()
+            raise EggHatchError('となりのボックスに空きがありません。')
 
     # 色違いのタマゴを空いている位置に移動する（フィールドの状態）
     def moveShinyEggToEmpty(self):
@@ -706,14 +729,16 @@ class SWSH_Egg_1BOX(ImageProcPythonCommandTrim):
         lang_list = ['ENG','JPN']
         lang='ENG'
         show_value = True
-        mode_list = ['チェックなし','6V','AS0-4V','CS0-4V','A0-5V','C0-5V','S0-5V']
+        mode_list = ['チェックなし','6V','AS0-4V','CS0-4V','A0-5V','C0-5V','S0-5V','A抜け5V','C抜け5V']
         status_list = [None,
                         [31,31,31,31,31,31],
                         [31,0,31,31,31,0],
                         [31,31,31,0,31,0],
                         [31,0,31,31,31,31],
                         [31,31,31,0,31,31],
-                        [31,31,31,31,31,0]]
+                        [31,31,31,31,31,0],
+                        [31,99,31,31,31,31],
+                        [31,31,31,99,31,31]]
         mode = 'チェックなし'
         pkmn_name = '剣盾'
 
@@ -739,6 +764,7 @@ class SWSH_Egg_1BOX(ImageProcPythonCommandTrim):
                 self.jprint("未設定項目があります。再度設定してください。")
                 continue
         
+        self.target_status_name = ret[5]
         if ret[5] != 'チェックなし':
             ret[5] = status_list[mode_list.index(ret[5])]
         else:
