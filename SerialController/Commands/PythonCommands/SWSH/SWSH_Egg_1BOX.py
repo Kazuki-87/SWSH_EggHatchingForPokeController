@@ -89,8 +89,8 @@ class SWSH_Egg_1BOX(ImageProcPythonCommandTrim):
                 self.press(Direction(Stick.LEFT,45), duration=5, wait=0.5)
                 count = 0
                 while count < 30:
-                    if (self.isContainTemplate('SWSH/EGG_Util/woman1.png', threshold=0.78, use_gray=True, show_value=self.show_value)
-                        or self.isContainTemplate('SWSH/EGG_Util/woman3.png', threshold=0.78, use_gray=True, show_value=self.show_value)):
+                    if (self.isContainTemplate('SWSH/EGG_Util/woman1.png', threshold=0.75, use_gray=True, show_value=self.show_value)
+                        or self.isContainTemplate('SWSH/EGG_Util/woman3.png', threshold=0.75, use_gray=True, show_value=self.show_value)):
                         self.press(Button.A, 0.1, 2)
                         if not self.isContainTemplate(f'SWSH/EGG_Util/{self.lang}/notEggText.png', 0.85, use_gray=False, show_value=self.show_value):
                             count += 1
@@ -278,7 +278,11 @@ class SWSH_Egg_1BOX(ImageProcPythonCommandTrim):
     
     # 手持ちを開く
     def openTemochi(self):
+        print('_method_openTemochi')
         while not self.isContainTemplate(f'SWSH/EGG_Util/{self.lang}/menu.png', 0.85):
+            # 孵化中の呼び出しで、ラグ等で孵化メッセージ表示時にメニューを開こうとしていた場合、処理をを終える
+            if self.isContainTemplate(f'SWSH/EGG_Util/{self.lang}/oya.png', 0.7):
+                return
             self.press(Button.X, 0.1, 1.0)
         isSelectedTemochi = False
         if not self.isContainTemplate('SWSH/EGG_Util/temochi.png', 0.85):
@@ -492,13 +496,17 @@ class SWSH_Egg_1BOX(ImageProcPythonCommandTrim):
                 count += 1
                 if count >= 500:
                     self.holdEnd([Direction(Stick.LEFT, 85), Direction(Stick.RIGHT, 180)])
-                    if self.checkHasEggs():
+                    if not self.checkYY():
                         self.hold([Direction(Stick.LEFT, 85), Direction(Stick.RIGHT, 180)])
-                        count = 0
-                        continue
+                        break
                     else:
-                        print('ERROR: hatching - run time over')
-                        return False,hatched_eggs
+                        if self.checkHasEggs():
+                            self.hold([Direction(Stick.LEFT, 85), Direction(Stick.RIGHT, 180)])
+                            count = 0
+                            continue
+                        else:
+                            print('ERROR: hatching - run time over')
+                            return False,hatched_eggs
             # end run
             self.holdEnd([Direction(Stick.LEFT, 85), Direction(Stick.RIGHT, 180)])
             self.hatched_egg_total += 1
@@ -518,7 +526,12 @@ class SWSH_Egg_1BOX(ImageProcPythonCommandTrim):
     
     # 手持ちにタマゴがあるか確認する
     def checkHasEggs(self):
+        print('_method_checkHasEggs')
+        if self.isContainTemplate(f'SWSH/EGG_Util/{self.lang}/oya.png', 0.7):
+            return True
         self.openTemochi()
+        if self.isContainTemplate(f'SWSH/EGG_Util/{self.lang}/oya.png', 0.7):
+            return True
         if self.isContainTemplate(f'SWSH/EGG_Util/egg.png', 0.85, use_gray=False, show_value=self.show_value):
             self.closeMenu()
             return True

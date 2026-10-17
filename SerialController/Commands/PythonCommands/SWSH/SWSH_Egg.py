@@ -390,6 +390,9 @@ class SWSH_Egg(ImageProcPythonCommandTrim):
                 count += 1
                 if count >= 500:
                     self.holdEnd([Direction(Stick.LEFT, 85), Direction(Stick.RIGHT, 180)])
+                    if not self.checkYY():
+                        self.hold([Direction(Stick.LEFT, 85), Direction(Stick.RIGHT, 180)])
+                        break
                     if self.checkHasEggs():
                         self.hold([Direction(Stick.LEFT, 85), Direction(Stick.RIGHT, 180)])
                         count = 0
@@ -553,7 +556,7 @@ class SWSH_Egg(ImageProcPythonCommandTrim):
         line_num = 6
         is_notice_LINE= True
         is_sleep = True
-        lang_list = ['ENG']
+        lang_list = ['ENG','JPN']
         lang='ENG'
         show_value = True
         mode_list = ['卵受け取りのみ','孵化のみ','卵受け取り～孵化']
