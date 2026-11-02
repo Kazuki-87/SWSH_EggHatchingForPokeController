@@ -571,7 +571,7 @@ class SWSH_Egg(ImageProcPythonCommandTrim):
                 ['Check','近似値表示',show_value], #4
                 ['Combo','モード',mode_list,mode], #5
             ]
-            ret = self.dialogue6widget("BDSP自動孵化設定", dialogue_list)
+            ret = self.dialogue6widget("SWSH自動孵化設定", dialogue_list)
 
             if type(ret) == bool:
                 if ret == False:

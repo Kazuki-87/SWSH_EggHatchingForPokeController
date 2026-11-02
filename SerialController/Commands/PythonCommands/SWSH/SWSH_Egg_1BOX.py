@@ -771,7 +771,7 @@ class SWSH_Egg_1BOX(ImageProcPythonCommandTrim):
                 ['Entry','途中から：累計孵化数',egg_total], #7
                 ['Entry','途中から：累計色違い数',shiny_total] #8
             ]
-            ret = self.dialogue6widget("BDSP自動孵化設定", dialogue_list)
+            ret = self.dialogue6widget("SWSH自動孵化設定", dialogue_list)
 
             # ret[7]とret[8]が0以上の整数に変換できるか確認
             try:

@@ -732,7 +732,7 @@ class SWSH_Egg_Test(ImageProcPythonCommandTrim):
                 ['Entry','ポケモン名',pkmn_name] #6
                 ['Combo','テストモード',test_mode_list,test_mode], #7
             ]
-            ret = self.dialogue6widget("BDSP自動孵化設定", dialogue_list)
+            ret = self.dialogue6widget("SWSH自動孵化設定", dialogue_list)
 
             if type(ret) == bool:
                 if ret == False:
